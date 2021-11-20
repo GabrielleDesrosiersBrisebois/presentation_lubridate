@@ -1,0 +1,141 @@
+---
+title: "Packages lubridate et hms"
+subtitle: "Cours FAS-1002"  
+author: "Gabrielle Desrosiers-Brisebois"
+date: "2021-11-23"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: solarized-light
+      highlightLines: true
+      ratio: "16:9"
+      countIncrementalSlides: false
+      
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+library(tidyverse)
+library(lubridate)
+library(kableExtra)
+
+style_mono_light(background_color = "#f0fff6",
+                 link_color = "#7214c9",
+                 text_color = "#219251",
+                 header_color = "#219251",
+                 header_font_google = google_font("Oswald", "400"),
+                 text_font_google = google_font("Lato"),
+                 code_font_google = google_font("Fira Mono"),
+                 text_font_size = "22px")
+```
+
+## Pourquoi un package pour gérer les dates et les heures ?
+
+--
+
+.center["*Makes working with dates fun instead of frustrating* "]
+
+--
+
+- Plusieurs façons différentes d'inscrire des dates dans une banque de données :
+
+```{r}
+date1 <- "2021-11-23"             
+date2 <- "11-23-2021"
+date3 <- "11/23/2021"
+date4 <- "11232021"
+date5 <- "23-Nov-2021"
+date6 <- "2021-11-23 16:30:00"
+```
+
+--
+
+- Pour effectuer des opérations mathématiques :
+
+--
+
+- Pour harmoniser des données provenant de fuseaux horaires variés :
+
+---
+
+# Les variables de temps dans R :
+
+--
+
+### _Date_ : 
+
+- Lorsque les observations contiennent seulement des dates et pas de temps.
+
+--
+
+### _POSIXct_ _(calendar time)_ :
+
+- Enregistre l'information en secondes à partir du 1er janvier 1970.
+
+--
+
+### _POSIXlt_ _(local time)_ :
+
+- Enregistre l'information de manière séparée dans le format classique (année/mois/jour/heure/minute/seconde).
+
+---
+
+background-position: 800px 50px
+background-image: url("images/logo_bixi.png")
+background-size: 300px
+
+# Banque de données [BIXI Montréal](https://bixi.com/fr/donnees-ouvertes)
+
+Données ouvertes pour le mois d'octobre 2021.
+<br>
+La banque de données contient 6 variables et un total de 752 003 observations.
+<br>
+
+```{r}
+bixi <- read.csv("dataset/OD_2021_10_5.csv")
+```
+
+```{r echo = FALSE}
+kable(head(bixi), caption = "Banque de données BIXI") %>%
+  kable_styling(full_width = TRUE, font_size = 12) 
+```
+
+---
+class: center, middle
+
+# `lubridate`
+
+[<img src="images/logo_lubridate.png" width="150"/>](https://lubridate.tidyverse.org/)
+
+```{r eval=FALSE, include=TRUE}
+library(lubridate)
+```
+
+---
+
+## 1. Fonctions pour créer et transformer en format "date"
+
+### `as_date()`, `as_datetime` :
+
+##### En _base r_  :
+
+> as.Date
+
+> as.POSIXlt
+
+

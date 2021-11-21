@@ -14,6 +14,9 @@ output:
       countIncrementalSlides: false
       
 ---
+background-position: 900px 450px
+background-image: url("images/logo_tidyverse.png")
+background-size: 150px
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
@@ -52,7 +55,7 @@ style_mono_light(background_color = "#f0fff6",
 
 --
 
-- Plusieurs façons différentes d'inscrire des dates dans une banque de données :
+- Pour nettoyer et harmoniser des données, car il y a plusieurs façons différentes d'inscrire des dates dans une banque de données :
 
 ```{r}
 date1 <- "2021-11-23"             
@@ -65,11 +68,11 @@ date6 <- "2021-11-23 16:30:00"
 
 --
 
-- Pour effectuer des opérations mathématiques :
+- Pour effectuer des opérations mathématiques.
 
 --
 
-- Pour harmoniser des données provenant de fuseaux horaires variés :
+- Pour harmoniser des données provenant de fuseaux horaires variés.
 
 ---
 
@@ -91,7 +94,8 @@ date6 <- "2021-11-23 16:30:00"
 
 ### _POSIXlt_ _(local time)_ :
 
-- Enregistre l'information de manière séparée dans le format classique (année/mois/jour/heure/minute/seconde).
+- Enregistre l'information de manière séparée dans le format classique (année/mois/jour/heure/minute/seconde). 
+- Différences entre _POSIXct_ et _POSIXlt_ est perceptible avec la fonction `unclass()`.
 
 ---
 
@@ -101,13 +105,17 @@ background-size: 300px
 
 # Banque de données [BIXI Montréal](https://bixi.com/fr/donnees-ouvertes)
 
-Données ouvertes pour le mois d'octobre 2021.
+Données ouvertes pour le mois d'**octobre 2021**.
 <br>
-La banque de données contient 6 variables et un total de 752 003 observations.
+La banque de données contient **6 variables** et un total de **752 003 observations**.
 <br>
+
+Nous allons effectuer les manipulations à partir de la nouvelle banque de données `bixi_new`. 
 
 ```{r}
 bixi <- read.csv("dataset/OD_2021_10_5.csv")
+
+bixi_new <- bixi
 ```
 
 ```{r echo = FALSE}
@@ -130,12 +138,217 @@ library(lubridate)
 
 ## 1. Fonctions pour créer et transformer en format "date"
 
-### `as_date()`, `as_datetime` :
+### `as_date()`; `as_datetime` :
+
+```{r}
+class(bixi$start_date)
+
+bixi_new$start_date <- as_date(bixi_new$start_date)
+```
+
+```{r echo=FALSE}
+kable(head(bixi_new), caption = "Nouvelle variable start_date") %>%
+  kable_styling(full_width = FALSE, font_size = 12) %>% 
+  scroll_box(width = "1080px", height = "200px")
+```
+
+---
+
+### `as_date()`; `as_datetime` ...suite :
+
+```{r}
+bixi_new$end_date <- as_datetime(bixi_new$end_date)
+```
+
+```{r echo=FALSE}
+kable(head(bixi_new), caption = "Nouvelle variable end_date") %>%
+  kable_styling(full_width = FALSE, font_size = 12) 
+```
 
 ##### En _base r_  :
 
-> as.Date
+> **as.Date** : bixi_new$start_date <- as.Date(bixi_new$start_date)
 
-> as.POSIXlt
+> **as.POSIXct** : bixi_new$end_date <- as.POSIXct(bixi_new$end_date)
 
+---
 
+### `ymd()`; `mdy()`; `dmy()`:
+
+```{r}
+bixi_new <- bixi_new %>% 
+  dplyr::mutate(start_date = stringr::str_replace_all(start_date, "-", "/"))
+```
+
+```{r echo=FALSE}
+kable(head(bixi_new), caption = "Modification de la variable start_date") %>%
+  kable_styling(full_width = FALSE, font_size = 12) %>% 
+  scroll_box(width = "1080px", height = "150px")
+```
+
+```{r}
+bixi_new$start_date <- ymd(bixi_new$start_date)
+```
+
+```{r echo=FALSE}
+kable(head(bixi_new), caption = "Application de la fonction ymd()") %>%
+  kable_styling(full_width = FALSE, font_size = 12) %>% 
+  scroll_box(width = "1080px", height = "150px")
+```
+
+---
+
+## 2. Fonctions pour extraire des informations précises
+  
+### `year()`, `month()`, `day()` :
+
+```{r}
+bixi_new <- bixi_new %>% 
+  dplyr::mutate(day_end_date = day(end_date)) %>% 
+  dplyr::relocate(day_end_date, .after = "end_date")
+```
+
+```{r echo=FALSE}
+kable(head(bixi_new), caption = "Nouvelle variable day_end_date") %>%
+  kable_styling(full_width = FALSE, font_size = 12) %>% 
+  scroll_box(width = "1080px", height = "120px")
+```
+
+##### Une autre possibilité :
+
+> bixi_new$day_end_date <- format(bixi_new$end_date, format = "%d")
+<br>
+
+> bixi_new <- subset(bixi_new, select = c("start_date", "emplacement_pk_start", "end_date", "day_end_date", "emplacement_pk_end", "duration_sec", "is_member"))
+
+---
+
+### `yday()`; `wday()` : 
+
+```{r}
+bixi_new <- bixi_new %>% 
+  dplyr::mutate(yday = yday(end_date)) %>% 
+  dplyr::relocate(yday, .after = "day_end_date")
+```
+
+```{r}
+bixi_new <- bixi_new %>% 
+  dplyr::mutate(wday_end_date = wday(end_date)) %>% 
+  dplyr::relocate(wday_end_date, .after = "day_end_date")
+```
+
+```{r echo=FALSE}
+kable(head(bixi_new), caption = "Fonctions yday() et wday()") %>%
+  kable_styling(full_width = FALSE, font_size = 12) 
+```
+
+---
+
+```{r}
+bixi_new <- bixi_new %>% 
+  dplyr::mutate(wday_end_date = wday(end_date, 
+                                     label = TRUE, abbr = FALSE)) %>% #<<
+  dplyr::relocate(wday_end_date, .after = "day_end_date")
+```
+
+```{r echo=FALSE}
+kable(head(bixi_new), caption = "Fonction wday()") %>%
+  kable_styling(full_width = FALSE, font_size = 12) 
+```
+
+---
+
+## Trois unités de temps _(timespans)_
+  
+--
+  
+### Périodes :
+  
+- Elles suivent le temps d'horloge _(clocktime)_, elles ignorent les irrégularités d'une ligne du temps (les changements d'heure, les années bissextiles, etc.). 
+
+--
+  
+### Durées :
+  
+- Nombres de secondes entre deux mesures de temps, elles prennent en considération les irrégularités 
+
+--
+  
+### Intervalles :
+  
+- Période de temps précise entre deux instants spécifiques (un début et une fin).
+
+---
+
+background-image: url("images/cheat_sheet.png")
+background-position: 50% 50%
+
+## Aide-mémoire provenant du [_cheat sheet_](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_lubridate.pdf)
+
+---
+
+## 3. Calculs appliqués à des unités de temps
+
+.pull-left[
+#### Création de variables :
+
+```{r}
+maintenant <- now(tz = "America/New_York")
+remise <- ymd_hms("2021-12-23 6:59:00", tz = "America/New_York")  
+temps_restant <- remise - maintenant
+temps_restant
+```
+]
+
+.pull-right[
+#### `as.period`; `as.duration`; `as.interval` :
+
+```{r}
+as.period(temps_restant)
+as.duration(temps_restant)
+as.interval(maintenant, remise)
+```
+]
+
+---
+
+## Fonctions associées à `as.period`; `as.duration`; `as.interval` :
+
+#### Périodes : 
+
+```{r}
+remise + days(2)
+```
+
+> **Autres fonctions** : `years()`, `months()`, `weeks()`, `hours()`, `minutes()`, `seconds`, etc.
+
+#### Durées :
+
+```{r}
+remise + ddays(2)
+```
+
+> **Autres fonctions** : `dyears()`, `dmonths()`, `dweeks()`, `dhours()`, `dminutes()`, `dseconds`, etc.
+
+---
+
+#### Différence entre périodes et durées :
+
+```{r}
+nouvelle_date <- ymd_hms("2022-03-12 12:00:00", tz = "America/New_York")
+```
+
+```{r}
+nouvelle_date + days(1)  #fontion liée à une période
+nouvelle_date + ddays(1) #fonction liée à une durée
+```
+
+#### Intervalles :
+
+```{r}
+int_temps_restant <- maintenant %--% remise #crée un intervalle sans employer la fonction interval()
+
+int_flip(int_temps_restant)
+```
+
+> `int_start()`, `int_end()`, `int_length()`, `int_diff()`, `int_aligns()`, etc.

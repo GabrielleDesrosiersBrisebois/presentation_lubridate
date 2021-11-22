@@ -47,7 +47,7 @@ style_mono_light(background_color = "#f0fff6",
                  text_font_size = "22px")
 ```
 
-## Pourquoi un package pour gérer les dates et les heures ?
+## Pourquoi des packages réservés aux dates et aux heures ?
 
 --
 
@@ -69,15 +69,19 @@ date7 <- "23-11-2021 16,30,50"
 
 --
 
+- Pour créer des données de type dates/heures. 
+
+--
+
 - Pour effectuer des opérations mathématiques.
 
 --
 
-- Pour harmoniser des données provenant de fuseaux horaires variés.
+- Pour harmoniser des données provenant d'autres fuseaux horaires.
 
 ---
 
-# Les variables de temps dans R :
+# Les types de variables de temps dans R :
 
 --
 
@@ -139,7 +143,41 @@ library(hms)
 
 ---
 
-## 1. Fonctions pour créer/transformer en format "date"
+# Les types de variables dans `lubridate` et `hms`
+
+--
+
+### _hms_ :
+
+- Un objet de temps qui correspond au nombre de secondes écoulées depuis 00:00:00.
+
+```{r}
+hms::as.hms(90)
+```
+
+--
+
+### _date_ :
+
+- Une journée (année-mois-jour) qui correspond au nombre de jours écoulés depuis le 1970-01-01.
+
+```{r}
+as_date(18954)
+```
+
+---
+
+### _date-time_ :
+
+- Un point précis sur une ligne du temps qui correspond au nombre de secondes écoulées depuis le 1970-01-01 00:00:00 UTC.
+
+```{r}
+as_datetime(1637691000)
+```
+
+---
+
+## 1. Fonctions pour créer/transformer en format "date" et "temps"
 
 ### `as_date()`; `as_datetime` :
 
@@ -216,27 +254,31 @@ kable(head(bixi_new), caption = "Application des fonctions ymd() et ymd_hms()") 
 
 ---
 
-background-position: 440px 420px
+background-position: 470px 450px
 background-image: url("images/round_datetime_cheat_sheet.jpg")
-background-size: 350px
+background-size: 300px
  
 ### `round_date`; `floor_date`; `ceiling_date` :
 
 ```{r}
-bixi_new$end_date <-  round_date(bixi_new$end_date, unit = "minutes")
+bixi_new$end_date <-  round_date(bixi_new$end_date, unit = "seconds")
 ```
+
+##### En _base r_ :
+
+> **round.POSIXt** : bixi_new$end_date <- round.POSIXt(bixi_new$end_date, "secs")
 
 ```{r echo=FALSE}
 kable(head(bixi_new), caption = "Application de la fonction round_date") %>%
   kable_styling(full_width = FALSE, font_size = 12) %>% 
-  scroll_box(width = "1080px", height = "200px")
+  scroll_box(width = "1080px", height = "120px")
 ```
 
 ---
 
 ## 2. Fonctions pour extraire des informations précises
   
-### `year()`; `month()`; `day()` :
+### `year()`; `month()`; `day()`; `hour()`; `minute()`; `second()` :
 
 ```{r}
 bixi_new <- bixi_new %>% 
@@ -390,11 +432,25 @@ int_flip(int_temps_restant)
 > `int_start()`, `int_end()`, `int_length()`, `int_diff()`, `int_aligns()`, etc.
 
 ---
-class: center, middle
+class: top, left
 
-# `clock`
+# Ressources additionnelles :
 
-[<img src="images/logo_clock.png" width="150"/>](https://www.tidyverse.org/blog/2021/03/clock-0-1-0/)
+- [R for Data Science](https://r4ds.had.co.nz/dates-and-times.html)
+- [Cran.R Project `lubridate`](https://cran.r-project.org/web/packages/tidyverse/tidyverse.pdf)
+- [Cran.R Project `hms`](https://cran.r-project.org/web/packages/hms/hms.pdf)
+- [ds4psy](https://bookdown.org/hneth/ds4psy/10-3-time-lubridate.html)
+- [The Epidemiologist R Handbook](https://epirhandbook.com/en/working-with-dates.html)
+
+---
+
+background-position: 50% 50%
+background-image: url("images/merci.gif")
+
+class: top, center
+
+#Merci de votre attention!
+
 
 
 

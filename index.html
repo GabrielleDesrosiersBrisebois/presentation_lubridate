@@ -98,7 +98,7 @@ Données ouvertes pour le mois d'**octobre 2021**.
 La banque de données contient **6 variables** et un total de **752 003 observations**.
 &lt;br&gt;
 
-Nous allons effectuer les manipulations à partir de la nouvelle banque de données `bixi_new`. 
+Les manipulations seront enregistrées dans la nouvelle banque de données `bixi_new`. 
 
 
 ```r
@@ -208,7 +208,7 @@ hms::as.hms(90)
 
 ### _date_ :
 
-- Une journée (année-mois-jour) qui correspond au nombre de jours écoulés depuis le 1970-01-01.
+- Un moment précis (année-mois-jour) qui correspond au nombre de jours écoulés depuis le 1970-01-01.
 
 
 ```r
@@ -1002,7 +1002,7 @@ temps_restant
 ```
 
 ```
-## Time difference of 30.74163 days
+## Time difference of 30.7077 days
 ```
 ]
 
@@ -1015,7 +1015,7 @@ as.period(temps_restant)
 ```
 
 ```
-## [1] "30d 17H 47M 56.720892906189S"
+## [1] "30d 16H 59M 5.19270300865173S"
 ```
 
 ```r
@@ -1023,7 +1023,7 @@ as.duration(temps_restant)
 ```
 
 ```
-## [1] "2656076.72089291s (~4.39 weeks)"
+## [1] "2653145.19270301s (~4.39 weeks)"
 ```
 
 ```r
@@ -1031,7 +1031,7 @@ as.interval(maintenant, remise)
 ```
 
 ```
-## [1] 2021-11-22 13:11:03 EST--2021-12-23 06:59:00 EST
+## [1] 2021-11-22 13:59:54 EST--2021-12-23 06:59:00 EST
 ```
 ]
 
@@ -1101,7 +1101,7 @@ int_flip(int_temps_restant)
 ```
 
 ```
-## [1] 2021-12-23 06:59:00 EST--2021-11-22 13:11:03 EST
+## [1] 2021-12-23 06:59:00 EST--2021-11-22 13:59:54 EST
 ```
 
 &gt; `int_start()`, `int_end()`, `int_length()`, `int_diff()`, `int_aligns()`, etc.

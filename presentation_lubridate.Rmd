@@ -115,7 +115,7 @@ Données ouvertes pour le mois d'**octobre 2021**.
 La banque de données contient **6 variables** et un total de **752 003 observations**.
 <br>
 
-Nous allons effectuer les manipulations à partir de la nouvelle banque de données `bixi_new`. 
+Les manipulations seront enregistrées dans la nouvelle banque de données `bixi_new`. 
 
 ```{r}
 bixi <- read.csv("dataset/OD_2021_10_5.csv")
@@ -159,7 +159,7 @@ hms::as.hms(90)
 
 ### _date_ :
 
-- Une journée (année-mois-jour) qui correspond au nombre de jours écoulés depuis le 1970-01-01.
+- Un moment précis (année-mois-jour) qui correspond au nombre de jours écoulés depuis le 1970-01-01.
 
 ```{r}
 as_date(18954)

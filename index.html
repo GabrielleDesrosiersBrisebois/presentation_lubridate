@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Packages lubridate et hms</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gabrielle Desrosiers-Brisebois" />
+    <meta name="date" content="2021-11-23" />
+    <script src="presentation_lubridate_files/header-attrs/header-attrs.js"></script>
+    <script src="presentation_lubridate_files/kePrint/kePrint.js"></script>
+    <link href="presentation_lubridate_files/lightable/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Packages lubridate et hms
+## Cours FAS-1002
+### Gabrielle Desrosiers-Brisebois
+### 2021-11-23
+
+---
+
+background-position: 900px 475px
+background-image: url("images/logo_tidyverse.png")
+background-size: 150px
+
+
+
+
+
+## Pourquoi des packages réservés aux dates et aux heures ?
+
+--
+
+.center["*Makes working with dates fun instead of frustrating* "]
+
+--
+
+- Pour nettoyer et harmoniser des données, car il y a plusieurs façons différentes d'inscrire des dates dans une banque de données :
+
+
+```r
+date1 &lt;- "2021-11-23"             
+date2 &lt;- "11-23-2021"
+date3 &lt;- "11/23/2021"
+date4 &lt;- "11232021"
+date5 &lt;- "23-Nov-2021"
+date6 &lt;- "2021-11-23 16:30:50"
+date7 &lt;- "23-11-2021 16,30,50"
+```
+
+--
+
+- Pour créer des données de type dates/heures. 
+
+--
+
+- Pour effectuer des opérations mathématiques.
+
+--
+
+- Pour harmoniser des données provenant d'autres fuseaux horaires.
+
+---
+
+# Les types de variables de temps dans R :
+
+--
+
+### _Date_ : 
+
+- Lorsque les observations contiennent seulement des dates et pas de temps.
+
+--
+
+### _POSIXct_ _(calendar time)_ :
+
+- Enregistre l'information en secondes à partir du 1er janvier 1970.
+
+--
+
+### _POSIXlt_ _(local time)_ :
+
+- Enregistre l'information de manière séparée dans le format classique (année/mois/jour/heure/minute/seconde). 
+- Différences entre _POSIXct_ et _POSIXlt_ est perceptible avec la fonction `unclass()`.
+
+---
+
+background-position: 800px 50px
+background-image: url("images/logo_bixi.png")
+background-size: 300px
+
+# Banque de données [BIXI Montréal](https://bixi.com/fr/donnees-ouvertes)
+
+Données ouvertes pour le mois d'**octobre 2021**.
+&lt;br&gt;
+La banque de données contient **6 variables** et un total de **752 003 observations**.
+&lt;br&gt;
+
+Nous allons effectuer les manipulations à partir de la nouvelle banque de données `bixi_new`. 
+
+
+```r
+bixi &lt;- read.csv("dataset/OD_2021_10_5.csv")
+
+bixi_new &lt;- bixi
+```
+
+&lt;table class="table" style="font-size: 12px; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Banque de données BIXI&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; start_date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; emplacement_pk_start &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; end_date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; emplacement_pk_end &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; duration_sec &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; is_member &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 06:21:22.587 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 06:37:32.601 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 185 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 970 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 23:46:25.598 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 23:50:39.080 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 507 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 253 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 17:47:51.820 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 18:10:53.412 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1381 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 17:36:00.790 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 17:57:39.598 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1298 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 15:44:51.014 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 16:19:58.763 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2107 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 16:51:43.357 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 17:33:40.679 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1113 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2517 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+class: center, middle
+
+# `lubridate`&lt;br&gt;`hms`
+
+[&lt;img src="images/logo_lubridate.png" width="150"/&gt;](https://lubridate.tidyverse.org/)
+[&lt;img src="images/logo_hms.png" width="150"/&gt;](https://hms.tidyverse.org/)
+
+
+```r
+library(lubridate)
+library(hms)
+```
+
+---
+
+# Les types de variables dans `lubridate` et `hms`
+
+--
+
+### _hms_ :
+
+- Un objet de temps qui correspond au nombre de secondes écoulées depuis 00:00:00.
+
+
+```r
+hms::as.hms(90)
+```
+
+```
+## 00:01:30
+```
+
+--
+
+### _date_ :
+
+- Une journée (année-mois-jour) qui correspond au nombre de jours écoulés depuis le 1970-01-01.
+
+
+```r
+as_date(18954)
+```
+
+```
+## [1] "2021-11-23"
+```
+
+---
+
+### _date-time_ :
+
+- Un point précis sur une ligne du temps qui correspond au nombre de secondes écoulées depuis le 1970-01-01 00:00:00 UTC.
+
+
+```r
+as_datetime(1637691000)
+```
+
+```
+## [1] "2021-11-23 18:10:00 UTC"
+```
+
+---
+
+## 1. Fonctions pour créer/transformer en format "date" et "temps"
+
+### `as_date()`; `as_datetime` :
+
+
+```r
+class(bixi$start_date)
+```
+
+```
+## [1] "character"
+```
+
+```r
+bixi_new$start_date &lt;- as_date(bixi_new$start_date)
+```
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; overflow-x: scroll; width:1080px; "&gt;&lt;table class="table" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Nouvelle variable start_date&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; start_date &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; emplacement_pk_start &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; end_date &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; emplacement_pk_end &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; duration_sec &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; is_member &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 06:37:32.601 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 185 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 970 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 23:50:39.080 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 507 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 253 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 18:10:53.412 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1381 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 17:57:39.598 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1298 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 16:19:58.763 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2107 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 17:33:40.679 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1113 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2517 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+---
+
+### `as_date()`; `as_datetime` ...suite :
+
+
+```r
+bixi_new$end_date &lt;- as_datetime(bixi_new$end_date)
+```
+
+&lt;table class="table" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Nouvelle variable end_date&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; start_date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; emplacement_pk_start &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; end_date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; emplacement_pk_end &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; duration_sec &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; is_member &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 06:37:32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 185 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 970 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 23:50:39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 507 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 253 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 18:10:53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1381 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 17:57:39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1298 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 16:19:58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2107 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 17:33:40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1113 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2517 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+##### En _base r_  :
+
+&gt; **as.Date** : bixi_new$start_date &lt;- as.Date(bixi_new$start_date)
+
+&gt; **as.POSIXct** : bixi_new$end_date &lt;- as.POSIXct(bixi_new$end_date)
+
+---
+
+### `ymd()`; `mdy()`; `dmy()`:
+
+
+```r
+mdy(date2)     #"11-23-2021"
+```
+
+```
+## [1] "2021-11-23"
+```
+
+```r
+mdy(date3)     #"11/23/2021"
+```
+
+```
+## [1] "2021-11-23"
+```
+
+```r
+mdy(date4)     #"11232021"
+```
+
+```
+## [1] "2021-11-23"
+```
+
+```r
+dmy(date5)     #"23-Nov-2021"
+```
+
+```
+## [1] "2021-11-23"
+```
+
+```r
+dmy_hms(date7) #"23-11-2021 16,30,50"
+```
+
+```
+## [1] "2021-11-23 16:30:50 UTC"
+```
+
+---
+
+### Ces fonctions d'appliquent aussi à un _dataframe_ :
+
+
+```r
+bixi_new &lt;- bixi_new %&gt;% 
+  dplyr::mutate(start_date = stringr::str_replace_all(start_date, "-", "/")) %&gt;% 
+  dplyr::mutate(end_date = stringr::str_replace_all(end_date, "-", "/")) %&gt;% 
+  dplyr::mutate(end_date = stringr::str_replace_all(end_date, ":", ","))
+```
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:150px; overflow-x: scroll; width:1080px; "&gt;&lt;table class="table" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Modification des variables start_date et end_date&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; start_date &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; emplacement_pk_start &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; end_date &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; emplacement_pk_end &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; duration_sec &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; is_member &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021/10/17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021/10/17 06,37,32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 185 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 970 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021/10/30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021/10/30 23,50,39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 507 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 253 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021/10/10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021/10/10 18,10,53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1381 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021/10/07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021/10/07 17,57,39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1298 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021/10/28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021/10/28 16,19,58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2107 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021/10/15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021/10/15 17,33,40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1113 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2517 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+
+```r
+bixi_new$start_date &lt;- ymd(bixi_new$start_date)
+bixi_new$end_date &lt;- ymd_hms(bixi_new$end_date)
+```
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:150px; overflow-x: scroll; width:1080px; "&gt;&lt;table class="table" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Application des fonctions ymd() et ymd_hms()&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; start_date &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; emplacement_pk_start &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; end_date &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; emplacement_pk_end &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; duration_sec &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; is_member &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 06:37:32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 185 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 970 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 23:50:39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 507 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 253 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 18:10:53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1381 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 17:57:39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1298 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 16:19:58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2107 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 17:33:40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1113 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2517 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+---
+
+background-position: 470px 450px
+background-image: url("images/round_datetime_cheat_sheet.jpg")
+background-size: 300px
+ 
+### `round_date`; `floor_date`; `ceiling_date` :
+
+
+```r
+bixi_new$end_date &lt;-  round_date(bixi_new$end_date, unit = "seconds")
+```
+
+##### En _base r_ :
+
+&gt; **round.POSIXt** : bixi_new$end_date &lt;- round.POSIXt(bixi_new$end_date, "secs")
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:120px; overflow-x: scroll; width:1080px; "&gt;&lt;table class="table" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Application de la fonction round_date&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; start_date &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; emplacement_pk_start &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; end_date &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; emplacement_pk_end &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; duration_sec &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; is_member &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 06:37:32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 185 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 970 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 23:50:39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 507 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 253 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 18:10:53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1381 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 17:57:39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1298 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 16:19:58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2107 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 17:33:40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1113 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2517 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+---
+
+## 2. Fonctions pour extraire des informations précises
+  
+### `year()`; `month()`; `day()`; `hour()`; `minute()`; `second()` :
+
+
+```r
+bixi_new &lt;- bixi_new %&gt;% 
+  dplyr::mutate(day_end_date = day(end_date)) %&gt;% 
+  dplyr::relocate(day_end_date, .after = "end_date")
+```
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:120px; overflow-x: scroll; width:1080px; "&gt;&lt;table class="table" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Nouvelle variable day_end_date&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; start_date &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; emplacement_pk_start &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; end_date &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; day_end_date &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; emplacement_pk_end &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; duration_sec &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; is_member &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 06:37:32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 185 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 970 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 23:50:39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 507 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 253 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 18:10:53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1381 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 17:57:39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1298 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 16:19:58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2107 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 17:33:40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1113 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2517 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+##### Une autre possibilité :
+
+&gt; bixi_new$day_end_date &lt;- format(bixi_new$end_date, format = "%d")
+&lt;br&gt;
+
+&gt; bixi_new &lt;- subset(bixi_new, select = c("start_date", "emplacement_pk_start", "end_date", "day_end_date", "emplacement_pk_end", "duration_sec", "is_member"))
+
+---
+
+### `yday()`; `wday()` : 
+
+
+```r
+bixi_new &lt;- bixi_new %&gt;% 
+  dplyr::mutate(yday = yday(end_date)) %&gt;% 
+  dplyr::relocate(yday, .after = "day_end_date")
+```
+
+
+```r
+bixi_new &lt;- bixi_new %&gt;% 
+  dplyr::mutate(wday_end_date = wday(end_date)) %&gt;% 
+  dplyr::relocate(wday_end_date, .after = "day_end_date")
+```
+
+&lt;table class="table" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Fonctions yday() et wday()&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; start_date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; emplacement_pk_start &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; end_date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; day_end_date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; wday_end_date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; yday &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; emplacement_pk_end &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; duration_sec &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; is_member &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 06:37:32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 290 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 185 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 970 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 23:50:39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 303 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 507 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 253 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 18:10:53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 283 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1381 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 17:57:39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 280 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1298 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 16:19:58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2107 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 17:33:40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 288 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1113 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2517 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+
+```r
+bixi_new &lt;- bixi_new %&gt;% 
+  dplyr::mutate(wday_end_date = wday(end_date, 
+*                                    label = TRUE, abbr = FALSE)) %&gt;%
+  dplyr::relocate(wday_end_date, .after = "day_end_date")
+```
+
+&lt;table class="table" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Fonction wday()&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; start_date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; emplacement_pk_start &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; end_date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; day_end_date &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; wday_end_date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; yday &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; emplacement_pk_end &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; duration_sec &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; is_member &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-17 06:37:32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; dimanche &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 290 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 185 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 970 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-30 23:50:39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; samedi &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 303 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 507 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 253 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-10 18:10:53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; dimanche &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 283 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1381 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-07 17:57:39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; jeudi &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 280 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1298 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-28 16:19:58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; jeudi &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2107 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-10-15 17:33:40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; vendredi &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 288 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1113 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2517 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Trois unités de temps _(timespans)_
+  
+--
+  
+### Périodes :
+  
+- Elles suivent le temps d'horloge _(clocktime)_, elles ignorent les irrégularités d'une ligne du temps (les changements d'heure, les années bissextiles, etc.). 
+
+--
+  
+### Durées :
+  
+- Nombres de secondes entre deux mesures de temps, elles prennent en considération les irrégularités 
+
+--
+  
+### Intervalles :
+  
+- Période de temps précise entre deux instants spécifiques (un début et une fin).
+
+---
+
+background-image: url("images/timespans_cheat_sheet.png")
+background-position: 50% 50%
+
+## Aide-mémoire provenant du [_cheat sheet_](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_lubridate.pdf)
+
+---
+
+## 3. Calculs appliqués à des unités de temps
+
+.pull-left[
+#### Création de variables :
+
+
+```r
+maintenant &lt;- now(tz = "America/New_York")
+remise &lt;- ymd_hms("2021-12-23 6:59:00", tz = "America/New_York")  
+temps_restant &lt;- remise - maintenant
+temps_restant
+```
+
+```
+## Time difference of 30.74163 days
+```
+]
+
+.pull-right[
+#### `as.period`; `as.duration`; `as.interval` :
+
+
+```r
+as.period(temps_restant)
+```
+
+```
+## [1] "30d 17H 47M 56.720892906189S"
+```
+
+```r
+as.duration(temps_restant)
+```
+
+```
+## [1] "2656076.72089291s (~4.39 weeks)"
+```
+
+```r
+as.interval(maintenant, remise)
+```
+
+```
+## [1] 2021-11-22 13:11:03 EST--2021-12-23 06:59:00 EST
+```
+]
+
+---
+
+## Fonctions associées à `as.period`; `as.duration`; `as.interval` :
+
+#### Périodes : 
+
+
+```r
+remise + days(2)
+```
+
+```
+## [1] "2021-12-25 06:59:00 EST"
+```
+
+&gt; **Autres fonctions** : `years()`, `months()`, `weeks()`, `hours()`, `minutes()`, `seconds`, etc.
+
+#### Durées :
+
+
+```r
+remise + ddays(2)
+```
+
+```
+## [1] "2021-12-25 06:59:00 EST"
+```
+
+&gt; **Autres fonctions** : `dyears()`, `dmonths()`, `dweeks()`, `dhours()`, `dminutes()`, `dseconds`, etc.
+
+---
+
+#### Différence entre périodes et durées :
+
+
+```r
+nouvelle_date &lt;- ymd_hms("2022-03-12 12:00:00", tz = "America/New_York")
+```
+
+
+```r
+nouvelle_date + days(1)  #fontion liée à une période
+```
+
+```
+## [1] "2022-03-13 12:00:00 EDT"
+```
+
+```r
+nouvelle_date + ddays(1) #fonction liée à une durée
+```
+
+```
+## [1] "2022-03-13 13:00:00 EDT"
+```
+
+#### Intervalles :
+
+
+```r
+int_temps_restant &lt;- maintenant %--% remise #crée un intervalle sans employer la fonction interval()
+
+int_flip(int_temps_restant)
+```
+
+```
+## [1] 2021-12-23 06:59:00 EST--2021-11-22 13:11:03 EST
+```
+
+&gt; `int_start()`, `int_end()`, `int_length()`, `int_diff()`, `int_aligns()`, etc.
+
+---
+class: top, left
+
+# Ressources additionnelles :
+
+- [R for Data Science](https://r4ds.had.co.nz/dates-and-times.html)
+- [Cran.R Project `lubridate`](https://cran.r-project.org/web/packages/tidyverse/tidyverse.pdf)
+- [Cran.R Project `hms`](https://cran.r-project.org/web/packages/hms/hms.pdf)
+- [ds4psy](https://bookdown.org/hneth/ds4psy/10-3-time-lubridate.html)
+- [The Epidemiologist R Handbook](https://epirhandbook.com/en/working-with-dates.html)
+
+---
+
+background-position: 50% 50%
+background-image: url("images/merci.gif")
+
+class: top, center
+
+#Merci de votre attention!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "solarized-light",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -14,7 +14,7 @@ output:
       countIncrementalSlides: false
       
 ---
-background-position: 900px 450px
+background-position: 900px 475px
 background-image: url("images/logo_tidyverse.png")
 background-size: 150px
 
@@ -63,7 +63,8 @@ date2 <- "11-23-2021"
 date3 <- "11/23/2021"
 date4 <- "11232021"
 date5 <- "23-Nov-2021"
-date6 <- "2021-11-23 16:30:00"
+date6 <- "2021-11-23 16:30:50"
+date7 <- "23-11-2021 16,30,50"
 ```
 
 --
@@ -126,17 +127,19 @@ kable(head(bixi), caption = "Banque de données BIXI") %>%
 ---
 class: center, middle
 
-# `lubridate`
+# `lubridate`<br>`hms`
 
 [<img src="images/logo_lubridate.png" width="150"/>](https://lubridate.tidyverse.org/)
+[<img src="images/logo_hms.png" width="150"/>](https://hms.tidyverse.org/)
 
 ```{r eval=FALSE, include=TRUE}
 library(lubridate)
+library(hms)
 ```
 
 ---
 
-## 1. Fonctions pour créer et transformer en format "date"
+## 1. Fonctions pour créer/transformer en format "date"
 
 ### `as_date()`; `as_datetime` :
 
@@ -176,31 +179,64 @@ kable(head(bixi_new), caption = "Nouvelle variable end_date") %>%
 ### `ymd()`; `mdy()`; `dmy()`:
 
 ```{r}
+mdy(date2)     #"11-23-2021"
+mdy(date3)     #"11/23/2021"
+mdy(date4)     #"11232021"
+dmy(date5)     #"23-Nov-2021"
+dmy_hms(date7) #"23-11-2021 16,30,50"
+```
+
+---
+
+### Ces fonctions d'appliquent aussi à un _dataframe_ :
+
+```{r}
 bixi_new <- bixi_new %>% 
-  dplyr::mutate(start_date = stringr::str_replace_all(start_date, "-", "/"))
+  dplyr::mutate(start_date = stringr::str_replace_all(start_date, "-", "/")) %>% 
+  dplyr::mutate(end_date = stringr::str_replace_all(end_date, "-", "/")) %>% 
+  dplyr::mutate(end_date = stringr::str_replace_all(end_date, ":", ","))
 ```
 
 ```{r echo=FALSE}
-kable(head(bixi_new), caption = "Modification de la variable start_date") %>%
+kable(head(bixi_new), caption = "Modification des variables start_date et end_date") %>%
   kable_styling(full_width = FALSE, font_size = 12) %>% 
   scroll_box(width = "1080px", height = "150px")
 ```
 
 ```{r}
 bixi_new$start_date <- ymd(bixi_new$start_date)
+bixi_new$end_date <- ymd_hms(bixi_new$end_date)
 ```
 
 ```{r echo=FALSE}
-kable(head(bixi_new), caption = "Application de la fonction ymd()") %>%
+kable(head(bixi_new), caption = "Application des fonctions ymd() et ymd_hms()") %>%
   kable_styling(full_width = FALSE, font_size = 12) %>% 
   scroll_box(width = "1080px", height = "150px")
 ```
 
 ---
 
+background-position: 440px 420px
+background-image: url("images/round_datetime_cheat_sheet.jpg")
+background-size: 350px
+ 
+### `round_date`; `floor_date`; `ceiling_date` :
+
+```{r}
+bixi_new$end_date <-  round_date(bixi_new$end_date, unit = "minutes")
+```
+
+```{r echo=FALSE}
+kable(head(bixi_new), caption = "Application de la fonction round_date") %>%
+  kable_styling(full_width = FALSE, font_size = 12) %>% 
+  scroll_box(width = "1080px", height = "200px")
+```
+
+---
+
 ## 2. Fonctions pour extraire des informations précises
   
-### `year()`, `month()`, `day()` :
+### `year()`; `month()`; `day()` :
 
 ```{r}
 bixi_new <- bixi_new %>% 
@@ -280,7 +316,7 @@ kable(head(bixi_new), caption = "Fonction wday()") %>%
 
 ---
 
-background-image: url("images/cheat_sheet.png")
+background-image: url("images/timespans_cheat_sheet.png")
 background-position: 50% 50%
 
 ## Aide-mémoire provenant du [_cheat sheet_](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_lubridate.pdf)
@@ -352,3 +388,13 @@ int_flip(int_temps_restant)
 ```
 
 > `int_start()`, `int_end()`, `int_length()`, `int_diff()`, `int_aligns()`, etc.
+
+---
+class: center, middle
+
+# `clock`
+
+[<img src="images/logo_clock.png" width="150"/>](https://www.tidyverse.org/blog/2021/03/clock-0-1-0/)
+
+
+

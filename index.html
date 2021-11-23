@@ -41,18 +41,18 @@ background-size: 150px
 
 
 ```r
-date1 &lt;- "2021-11-23"             
+date1 &lt;- "2021-11-23"           #format standard            
 date2 &lt;- "11-23-2021"
 date3 &lt;- "11/23/2021"
 date4 &lt;- "11232021"
 date5 &lt;- "23-Nov-2021"
-date6 &lt;- "2021-11-23 16:30:50"
+date6 &lt;- "2021-11-23 16:30:50"  #format standard
 date7 &lt;- "23-11-2021 16,30,50"
 ```
 
 --
 
-- Pour créer des données de type dates/heures. 
+- Pour créer et transformer des données en format date/heure. 
 
 --
 
@@ -82,8 +82,8 @@ date7 &lt;- "23-11-2021 16,30,50"
 
 ### _POSIXlt_ _(local time)_ :
 
-- Enregistre l'information de manière séparée dans le format classique (année/mois/jour/heure/minute/seconde). 
-- Différences entre _POSIXct_ et _POSIXlt_ est perceptible avec la fonction `unclass()`.
+- Enregistre l'information de manière séparée dans le format classique (année-mois-jour heure-minute-seconde). 
+- Différences entre _POSIXct_ et _POSIXlt_ sont perceptibles avec la fonction `unclass()`.
 
 ---
 
@@ -187,7 +187,7 @@ library(hms)
 
 ---
 
-# Les types de variables dans `lubridate` et `hms`
+# Les données date/temps dans `lubridate` et `hms`
 
 --
 
@@ -197,7 +197,7 @@ library(hms)
 
 
 ```r
-hms::as.hms(90)
+hms::as_hms(90)
 ```
 
 ```
@@ -398,7 +398,7 @@ bixi_new$end_date &lt;- as_datetime(bixi_new$end_date)
 
 ---
 
-### `ymd()`; `mdy()`; `dmy()`:
+### `ymd()`; `mdy()`; `dmy()` et `_h()`; `_hm()`; `_hms()` :
 
 
 ```r
@@ -605,7 +605,7 @@ bixi_new$end_date &lt;-  round_date(bixi_new$end_date, unit = "seconds")
 &gt; **round.POSIXt** : bixi_new$end_date &lt;- round.POSIXt(bixi_new$end_date, "secs")
 
 &lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:120px; overflow-x: scroll; width:1080px; "&gt;&lt;table class="table" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
-&lt;caption style="font-size: initial !important;"&gt;Application de la fonction round_date&lt;/caption&gt;
+&lt;caption style="font-size: initial !important;"&gt;Application de la fonction round_date()&lt;/caption&gt;
  &lt;thead&gt;
   &lt;tr&gt;
    &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; start_date &lt;/th&gt;
@@ -959,7 +959,7 @@ bixi_new &lt;- bixi_new %&gt;%
 
 ---
 
-## Trois unités de temps _(timespans)_
+## Trois catégories de temps _(timespans)_
   
 --
   
@@ -971,13 +971,13 @@ bixi_new &lt;- bixi_new %&gt;%
   
 ### Durées :
   
-- Nombres de secondes entre deux mesures de temps, elles prennent en considération les irrégularités 
+- Nombres de secondes entre deux mesures de temps, elles prennent en considération les irrégularités. 
 
 --
   
 ### Intervalles :
   
-- Période de temps précise entre deux instants spécifiques (un début et une fin).
+- Période de temps précise entre deux instants (un début et une fin).
 
 ---
 
@@ -1002,7 +1002,7 @@ temps_restant
 ```
 
 ```
-## Time difference of 30.70399 days
+## Time difference of 29.735 days
 ```
 ]
 
@@ -1015,7 +1015,7 @@ as.period(temps_restant)
 ```
 
 ```
-## [1] "30d 16H 53M 44.7709341049194S"
+## [1] "29d 17H 38M 24.1735620498657S"
 ```
 
 ```r
@@ -1023,7 +1023,7 @@ as.duration(temps_restant)
 ```
 
 ```
-## [1] "2652824.7709341s (~4.39 weeks)"
+## [1] "2569104.17356205s (~4.25 weeks)"
 ```
 
 ```r
@@ -1031,7 +1031,7 @@ as.interval(maintenant, remise)
 ```
 
 ```
-## [1] 2021-11-22 14:05:15 EST--2021-12-23 06:59:00 EST
+## [1] 2021-11-23 13:20:35 EST--2021-12-23 06:59:00 EST
 ```
 ]
 
@@ -1067,7 +1067,7 @@ remise + ddays(2)
 
 ---
 
-#### Différence entre périodes et durées :
+#### Différence entre une période et une durée :
 
 
 ```r
@@ -1101,10 +1101,68 @@ int_flip(int_temps_restant)
 ```
 
 ```
-## [1] 2021-12-23 06:59:00 EST--2021-11-22 14:05:15 EST
+## [1] 2021-12-23 06:59:00 EST--2021-11-23 13:20:35 EST
 ```
 
 &gt; `int_start()`, `int_end()`, `int_length()`, `int_diff()`, `int_aligns()`, etc.
+
+---
+
+# 4. Les fuseaux horaires
+
+&gt; #### **Rappel** : pour connaître votre fuseau horaire, vous pouvez utiliser la fonction `Sys.timezone()`. &lt;br&gt; La fonction `OlsonNames()` montre la liste complète des fuseaux horaires.
+
+#### Heures de Los Angeles 🎬, de New Delhi 🛕 et de Tokyo ⛩️ :
+
+
+```r
+heure_los_angeles &lt;- ymd_hms("2021-11-23 08:00:00", tz = "America/Los_Angeles")
+heure_new_delhi &lt;- ymd_hms("2021-11-23 16:30:00", tz = "Asia/Kolkata")
+heure_tokyo &lt;- ymd_hms("2021-11-23 23:00:00", tz = "Asia/Tokyo")
+```
+
+- Dans cet exemple, les heures de Los Angeles, de New Delhi et de Tokyo correspondent toutes à des heures variées dans le fuseau horaire de Montréal.
+
+---
+
+### `with_tz()` :
+
+- Cette fonction est utile lorsque l'on souhaite conserver le moment exact d'un autre fuseau horaire, mais que l'on veut le transformer dans le fuseau horaire de notre choix.
+
+#### Appliquée à un vecteur :
+
+
+```r
+heures_originales &lt;- c(heure_los_angeles, heure_new_delhi, heure_tokyo)
+```
+
+
+```r
+heures_de_montreal &lt;- with_tz(heures_originales, tzone = "America/New_York")
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Date/heure_Mtl &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Los Angeles &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-11-23 11:00:00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; New Delhi &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-11-23 06:00:00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tokyo &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-11-23 09:00:00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
 ---
 class: top, left
